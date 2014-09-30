@@ -13,8 +13,9 @@ import (
 	"net"
 )
 
+var matchid = uint64(0)
 var connid = uint64(0)
-var localAddr = flag.String("l", "localhost:9999", "local address")
+var localAddr = flag.String("l", ":9999", "local address")
 var remoteAddr = flag.String("r", "localhost:80", "remote address")
 var verbose = flag.Bool("v", false, "display server actions")
 var veryverbose = flag.Bool("vv", false, "display server actions and all tcp data")
@@ -73,7 +74,7 @@ type proxy struct {
 	erred         bool
 	errsig        chan bool
 	prefix        string
-	matcher       func([]byte) [][]byte
+	matcher       func([]byte)
 	replacer      func([]byte) []byte
 }
 
@@ -145,10 +146,7 @@ func (p *proxy) pipe(src, dst *net.TCPConn) {
 		b := buff[:n]
 		//execute match
 		if p.matcher != nil {
-			ms := p.matcher(b)
-			for i, m := range ms {
-				p.log("Match #%d: %s", i+1, string(m))
-			}
+			p.matcher(b)
 		}
 		//execute replace
 		if p.replacer != nil {
@@ -198,7 +196,7 @@ func warn(f string, args ...interface{}) {
 	fmt.Printf(c(f, "red")+"\n", args...)
 }
 
-func createMatcher(match string) func([]byte) [][]byte {
+func createMatcher(match string) func([]byte) {
 	if match == "" {
 		return nil
 	}
@@ -209,8 +207,12 @@ func createMatcher(match string) func([]byte) [][]byte {
 	}
 
 	log("Matching %s", re.String())
-	return func(input []byte) [][]byte {
-		return re.FindAll(input, -1)
+	return func(input []byte) {
+		ms := re.FindAll(input, -1)
+		for _, m := range ms {
+			matchid++
+			log("Match #%d: %s", matchid, string(m))
+		}
 	}
 }
 

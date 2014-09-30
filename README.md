@@ -11,15 +11,15 @@ go get github.com/lumanetworks/go-tcp-proxy
 ```
 $ go-tcp-proxy --help
 Usage of go-tcp-proxy:
-  -c=false: output ansi colors
-  -h=false: output hex
+  -c: output ansi colors
+  -h: output hex
   -l="localhost:9999": local address
-  -n=false: disable nagles algorithm
+  -n: disable nagles algorithm
   -r="localhost:80": remote address
   -match="": match regex (in the form 'regex')
   -replace="": replace regex (in the form 'regex~replacer')
-  -v=false: display server actions
-  -vv=false: display server actions and all tcp data
+  -v: display server actions
+  -vv: display server actions and all tcp data
 ```
 
 ### Simple Example
@@ -68,6 +68,10 @@ Replacing "ip": "([^"]+)" with "ip": "REDACTED"
   "ip": "REDACTED",
   ...
 ```
+
+### Todo
+
+* Match and replace binary data
 
 #### MIT License
 
