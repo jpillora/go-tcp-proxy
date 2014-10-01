@@ -2,6 +2,8 @@
 
 A small TCP proxy written in Go
 
+This project was intended for debugging text-based protocols. The next version will address binary protocols.
+
 ## Usage
 
 ```
@@ -72,6 +74,8 @@ Replacing "ip": "([^"]+)" with "ip": "REDACTED"
   "ip": "REDACTED",
   ...
 ```
+
+*Note: The `-replace` option is in the form `regex~replacer`. Where `replacer` may contain `$N` to substitute in group `N`.*
 
 ### Todo
 
