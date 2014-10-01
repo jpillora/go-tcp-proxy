@@ -22,6 +22,10 @@ Usage of go-tcp-proxy:
   -vv: display server actions and all tcp data
 ```
 
+*Note: Regex match and replace*
+**only works on text strings**
+*and does NOT work across packet boundaries*
+
 ### Simple Example
 
 Since HTTP runs over TCP, we can also use `go-tcp-proxy` as a primitive HTTP proxy:
@@ -71,7 +75,11 @@ Replacing "ip": "([^"]+)" with "ip": "REDACTED"
 
 ### Todo
 
-* Match and replace binary data
+* Refactor into `package tcpproxy` instead of `package main` for external use
+* Implement `tcpproxy.Conn` which provides accounting and hooks into the underlying `net.Conn`
+* Verify wire protocols by providing `encoding.BinaryUnmarshaler` to a `tcpproxy.Conn`
+* Modify wire protocols by also providing a map function
+* Implement [SOCKS v5](https://www.ietf.org/rfc/rfc1928.txt) to allow for user-decided remote addresses
 
 #### MIT License
 
