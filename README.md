@@ -79,7 +79,6 @@ Replacing "ip": "([^"]+)" with "ip": "REDACTED"
 
 ### Todo
 
-* Refactor into `package tcpproxy` instead of `package main` for external use
 * Implement `tcpproxy.Conn` which provides accounting and hooks into the underlying `net.Conn`
 * Verify wire protocols by providing `encoding.BinaryUnmarshaler` to a `tcpproxy.Conn`
 * Modify wire protocols by also providing a map function
