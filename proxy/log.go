@@ -14,6 +14,21 @@ type Logger interface {
 	Warn(f string, args ...interface{})
 }
 
+// NullLogger - An empty logger that ignores everything
+type NullLogger struct{}
+
+// Trace - no-op
+func (l NullLogger) Trace(f string, args ...interface{}) {}
+
+// Debug - no-op
+func (l NullLogger) Debug(f string, args ...interface{}) {}
+
+// Info - no-op
+func (l NullLogger) Info(f string, args ...interface{}) {}
+
+// Warn - no-op
+func (l NullLogger) Warn(f string, args ...interface{}) {}
+
 // ColorLogger - A Logger that logs to stdout in color
 type ColorLogger struct {
 	VeryVerbose bool

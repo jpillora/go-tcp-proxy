@@ -32,7 +32,7 @@ func New(lconn *net.TCPConn, laddr, raddr *net.TCPAddr) *Proxy {
 		raddr:  raddr,
 		erred:  false,
 		errsig: make(chan bool),
-		Log:    ColorLogger{},
+		Log:    NullLogger{},
 	}
 }
 
