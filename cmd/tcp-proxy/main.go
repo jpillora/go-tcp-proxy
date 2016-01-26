@@ -83,9 +83,10 @@ func main() {
 		p.Nagles = *nagles
 		p.OutputHex = *hex
 		p.Log = proxy.ColorLogger{
-			Verbose: *verbose,
-			Prefix:  fmt.Sprintf("Connection #%03d ", connid),
-			Color:   *colors,
+			Verbose:     *verbose,
+			VeryVerbose: *veryverbose,
+			Prefix:      fmt.Sprintf("Connection #%03d ", connid),
+			Color:       *colors,
 		}
 
 		go p.Start()
