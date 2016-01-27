@@ -1,4 +1,4 @@
-# go-tcp-proxy
+# tcp-proxy
 
 A small TCP proxy written in Go
 
@@ -7,12 +7,12 @@ This project was intended for debugging text-based protocols. The next version w
 ## Usage
 
 ```
-go get github.com/lumanetworks/go-tcp-proxy
+go get github.com/lumanetworks/go-tcp-proxy/cmd/tcp-proxy
 ```
 
 ```
-$ go-tcp-proxy --help
-Usage of go-tcp-proxy:
+$ tcp-proxy --help
+Usage of tcp-proxy:
   -c: output ansi colors
   -h: output hex
   -l="localhost:9999": local address
@@ -30,10 +30,10 @@ Usage of go-tcp-proxy:
 
 ### Simple Example
 
-Since HTTP runs over TCP, we can also use `go-tcp-proxy` as a primitive HTTP proxy:
+Since HTTP runs over TCP, we can also use `tcp-proxy` as a primitive HTTP proxy:
 
 ```
-$ go-tcp-proxy -r echo.jpillora.com:80
+$ tcp-proxy -r echo.jpillora.com:80
 Proxying from localhost:9999 to echo.jpillora.com:80
 ```
 
@@ -51,7 +51,7 @@ $ curl -H 'Host: echo.jpillora.com' localhost:9999/foo
 ### Match Example
 
 ```
-$ go-tcp-proxy -r echo.jpillora.com:80 -match 'Host: (.+)'
+$ tcp-proxy -r echo.jpillora.com:80 -match 'Host: (.+)'
 Proxying from localhost:9999 to echo.jpillora.com:80
 Matching Host: (.+)
 
@@ -63,7 +63,7 @@ Connection #001 Match #1: Host: echo.jpillora.com
 ### Replace Example
 
 ```
-$ go-tcp-proxy -r echo.jpillora.com:80 -replace '"ip": "([^"]+)"~"ip": "REDACTED"'
+$ tcp-proxy -r echo.jpillora.com:80 -replace '"ip": "([^"]+)"~"ip": "REDACTED"'
 Proxying from localhost:9999 to echo.jpillora.com:80
 Replacing "ip": "([^"]+)" with "ip": "REDACTED"
 ```
