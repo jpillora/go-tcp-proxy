@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"io"
 	"net"
+	"sync"
 )
 
 // Proxy - Manages a Proxy connection, piping data between local and remote.
@@ -54,7 +55,11 @@ type setNoDelayer interface {
 }
 
 // Start - open connection to remote and start proxying data.
-func (p *Proxy) Start() {
+func (p *Proxy) Start(wg ...*sync.WaitGroup) {
+	if len(wg) > 0 {
+		wg[0].Add(1)
+		defer wg[0].Done()
+	}
 	defer p.lconn.Close()
 
 	var err error
@@ -84,8 +89,8 @@ func (p *Proxy) Start() {
 	p.Log.Info("Opened %s >>> %s", p.laddr.String(), p.raddr.String())
 
 	//bidirectional copy
-	go p.pipe(p.lconn, p.rconn)
-	go p.pipe(p.rconn, p.lconn)
+	go p.pipe(p.lconn, p.rconn, wg...)
+	go p.pipe(p.rconn, p.lconn, wg...)
 
 	//wait for close...
 	<-p.errsig
@@ -103,7 +108,11 @@ func (p *Proxy) err(s string, err error) {
 	p.erred = true
 }
 
-func (p *Proxy) pipe(src, dst io.ReadWriter) {
+func (p *Proxy) pipe(src, dst io.ReadWriter, wg ...*sync.WaitGroup) {
+	if len(wg) > 0 {
+		wg[0].Add(1)
+		wg[0].Done()
+	}
 	islocal := src == p.lconn
 
 	var dataDirection string
