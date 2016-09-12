@@ -7,7 +7,7 @@ This project was intended for debugging text-based protocols. The next version w
 ## Usage
 
 ```
-go get github.com/lumanetworks/go-tcp-proxy/cmd/tcp-proxy
+go get github.com/jpillora/go-tcp-proxy/cmd/tcp-proxy
 ```
 
 ```
@@ -86,7 +86,7 @@ Replacing "ip": "([^"]+)" with "ip": "REDACTED"
 
 #### MIT License
 
-Copyright © 2014 Luma Networks <dev@jpillora.com>
+Copyright © 2014 Jaime Pillora <dev@jpillora.com>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
