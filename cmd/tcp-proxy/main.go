@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/lumanetworks/go-tcp-proxy"
+	"github.com/jpillora/go-tcp-proxy"
 )
 
 var (
