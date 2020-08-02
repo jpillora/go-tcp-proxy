@@ -1,7 +1,8 @@
 # test this file with
 #   goreleaser --skip-publish --rm-dist --config goreleaser.yml
 builds:
-  - main: ./main.go
+  - main: ./cmd/tcp-proxy
+    binary: tcp-proxy
     env:
       - CGO_ENABLED=0
     ldflags:

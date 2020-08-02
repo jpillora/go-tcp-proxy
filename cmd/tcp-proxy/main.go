@@ -8,10 +8,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/jpillora/go-tcp-proxy"
+	proxy "github.com/jpillora/go-tcp-proxy"
 )
 
 var (
+	version = "0.0.0-src"
 	matchid = uint64(0)
 	connid  = uint64(0)
 	logger  proxy.ColorLogger
@@ -36,7 +37,7 @@ func main() {
 		Color:   *colors,
 	}
 
-	logger.Info("Proxying from %v to %v", *localAddr, *remoteAddr)
+	logger.Info("go-tcp-proxy (%s) proxing from %v to %v ", version, *localAddr, *remoteAddr)
 
 	laddr, err := net.ResolveTCPAddr("tcp", *localAddr)
 	if err != nil {
