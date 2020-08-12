@@ -26,7 +26,7 @@ var (
 	colors      = flag.Bool("c", false, "output ansi colors")
 	unwrapTLS   = flag.Bool("unwrap-tls", false, "remote connection with TLS exposed unencrypted locally")
 	match       = flag.String("match", "", "match regex (in the form 'regex')")
-	replace     = flag.String("replace", "", "replace regex (in the form 'regex~replacer')")
+	replace     = flag.String("replace", "", "replace regex (in the form '/regex1/replacer1/regex2/replace2/' if / is delimiter)")
 )
 
 func main() {
@@ -118,23 +118,32 @@ func createReplacer(replace string) func([]byte) []byte {
 	if replace == "" {
 		return nil
 	}
-	//split by / (TODO: allow slash escapes)
-	parts := strings.Split(replace, "~")
-	if len(parts) != 2 {
+	delimiter := replace[:1]
+	parts := strings.Split(replace, delimiter)
+	parts = parts[1 : len(parts)-1]
+	if len(parts)%2 != 0 {
 		logger.Warn("Invalid replace option")
 		return nil
 	}
 
-	re, err := regexp.Compile(string(parts[0]))
-	if err != nil {
-		logger.Warn("Invalid replace regex: %s", err)
-		return nil
+	var res []*regexp.Regexp
+	var repls [][]byte
+	for i := 0; i < len(parts); i += 2 {
+		re, err := regexp.Compile(string(parts[i]))
+		if err != nil {
+			logger.Warn("Invalid replace regex: %s", err)
+			return nil
+		}
+		repl := []byte(parts[i+1])
+		logger.Info("Replacing %s with %s", re.String(), repl)
+		res = append(res, re)
+		repls = append(repls, repl)
 	}
 
-	repl := []byte(parts[1])
-
-	logger.Info("Replacing %s with %s", re.String(), repl)
 	return func(input []byte) []byte {
-		return re.ReplaceAll(input, repl)
+		for k, re := range res {
+			input = re.ReplaceAll(input, repls[k])
+		}
+		return input
 	}
 }
