@@ -16,6 +16,7 @@ type Proxy struct {
 	errsig        chan bool
 	tlsUnwrapp    bool
 	tlsAddress    string
+	fqdnAddress   string
 
 	Matcher  func([]byte)
 	Replacer func([]byte) []byte
@@ -28,14 +29,15 @@ type Proxy struct {
 
 // New - Create a new Proxy instance. Takes over local connection passed in,
 // and closes it when finished.
-func New(lconn *net.TCPConn, laddr, raddr *net.TCPAddr) *Proxy {
+func New(lconn *net.TCPConn, laddr, raddr *net.TCPAddr, addr string) *Proxy {
 	return &Proxy{
-		lconn:  lconn,
-		laddr:  laddr,
-		raddr:  raddr,
-		erred:  false,
-		errsig: make(chan bool),
-		Log:    NullLogger{},
+		lconn:       lconn,
+		laddr:       laddr,
+		raddr:       raddr,
+		fqdnAddress: addr,
+		erred:       false,
+		errsig:      make(chan bool),
+		Log:         NullLogger{},
 	}
 }
 
@@ -43,7 +45,7 @@ func New(lconn *net.TCPConn, laddr, raddr *net.TCPAddr) *Proxy {
 // which we want to unwrap the TLS to be able to connect without encryption
 // locally
 func NewTLSUnwrapped(lconn *net.TCPConn, laddr, raddr *net.TCPAddr, addr string) *Proxy {
-	p := New(lconn, laddr, raddr)
+	p := New(lconn, laddr, raddr, addr)
 	p.tlsUnwrapp = true
 	p.tlsAddress = addr
 	return p
@@ -64,10 +66,23 @@ func (p *Proxy) Start() {
 	} else {
 		p.rconn, err = net.DialTCP("tcp", nil, p.raddr)
 	}
-	if err != nil {
+	if err != nil && !p.tlsUnwrapp {
+		p.Log.Warn("Remote connection failed: %s, retry DNS resolution", err)
+		p.raddr, err = net.ResolveTCPAddr("tcp", p.fqdnAddress)
+		if err != nil {
+			p.Log.Warn("Remote connection failed: %s", err)
+			return
+		}
+		p.rconn, err = net.DialTCP("tcp", nil, p.raddr)
+		if err != nil {
+			p.Log.Warn("Remote connection failed: %s", err)
+			return
+		}
+	} else if err != nil && p.tlsUnwrapp {
 		p.Log.Warn("Remote connection failed: %s", err)
 		return
 	}
+
 	defer p.rconn.Close()
 
 	//nagles?
