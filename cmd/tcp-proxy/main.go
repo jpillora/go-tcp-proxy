@@ -75,7 +75,7 @@ func main() {
 			logger.Info("Unwrapping TLS")
 			p = proxy.NewTLSUnwrapped(conn, laddr, raddr, *remoteAddr)
 		} else {
-			p = proxy.New(conn, laddr, raddr)
+			p = proxy.New(conn, laddr, raddr, *remoteAddr)
 		}
 
 		p.Matcher = matcher
