@@ -7,7 +7,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/jpillora/go-tcp-proxy/amqphelper"
+	"github.com/tanopwan/go-tcp-proxy/amqphelper"
 )
 
 // AMQPProxy - Manages a Proxy connection, piping data between local and remote, and support AMQP frame
@@ -32,8 +32,8 @@ type AMQPProxy struct {
 
 // NewAMQP - Create a new Proxy instance. Takes over local connection passed in,
 // and closes it when finished.
-func NewAMQP(lconn *net.TCPConn, laddr, raddr *net.TCPAddr) *Proxy {
-	return &Proxy{
+func NewAMQP(lconn *net.TCPConn, laddr, raddr *net.TCPAddr) *AMQPProxy {
+	return &AMQPProxy{
 		lconn:  lconn,
 		laddr:  laddr,
 		raddr:  raddr,
@@ -46,7 +46,7 @@ func NewAMQP(lconn *net.TCPConn, laddr, raddr *net.TCPAddr) *Proxy {
 // NewAMQPTLSUnwrapped - Create a new Proxy instance with a remote TLS server for
 // which we want to unwrap the TLS to be able to connect without encryption
 // locally
-func NewAMQPTLSUnwrapped(lconn *net.TCPConn, laddr, raddr *net.TCPAddr, addr string) *Proxy {
+func NewAMQPTLSUnwrapped(lconn *net.TCPConn, laddr, raddr *net.TCPAddr, addr string) *AMQPProxy {
 	p := NewAMQP(lconn, laddr, raddr)
 	p.tlsUnwrapp = true
 	p.tlsAddress = addr

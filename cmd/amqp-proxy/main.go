@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	proxy "github.com/jpillora/go-tcp-proxy"
+	proxy "github.com/tanopwan/go-tcp-proxy"
 )
 
 var (
@@ -37,7 +37,7 @@ func main() {
 		Color:   *colors,
 	}
 
-	logger.Info("go-amqphelper-proxy (%s) proxing from %v to %v ", version, *localAddr, *remoteAddr)
+	logger.Info("go-amqp-proxy (%s) proxing from %v to %v ", version, *localAddr, *remoteAddr)
 
 	laddr, err := net.ResolveTCPAddr("tcp", *localAddr)
 	if err != nil {
@@ -70,7 +70,7 @@ func main() {
 		}
 		connid++
 
-		var p *proxy.Proxy
+		var p *proxy.AMQPProxy
 		if *unwrapTLS {
 			logger.Info("Unwrapping TLS")
 			p = proxy.NewAMQPTLSUnwrapped(conn, laddr, raddr, *remoteAddr)
