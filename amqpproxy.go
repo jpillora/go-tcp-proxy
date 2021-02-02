@@ -47,7 +47,7 @@ func NewAMQP(lconn *net.TCPConn, laddr, raddr *net.TCPAddr) *Proxy {
 // which we want to unwrap the TLS to be able to connect without encryption
 // locally
 func NewAMQPTLSUnwrapped(lconn *net.TCPConn, laddr, raddr *net.TCPAddr, addr string) *Proxy {
-	p := New(lconn, laddr, raddr)
+	p := NewAMQP(lconn, laddr, raddr)
 	p.tlsUnwrapp = true
 	p.tlsAddress = addr
 	return p

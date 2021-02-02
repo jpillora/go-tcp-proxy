@@ -73,9 +73,9 @@ func main() {
 		var p *proxy.Proxy
 		if *unwrapTLS {
 			logger.Info("Unwrapping TLS")
-			p = proxy.NewTLSUnwrapped(conn, laddr, raddr, *remoteAddr)
+			p = proxy.NewAMQPTLSUnwrapped(conn, laddr, raddr, *remoteAddr)
 		} else {
-			p = proxy.New(conn, laddr, raddr)
+			p = proxy.NewAMQP(conn, laddr, raddr)
 		}
 
 		p.Matcher = matcher
