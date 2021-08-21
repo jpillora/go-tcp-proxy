@@ -32,19 +32,45 @@ var (
 func main() {
 	flag.Parse()
 
+	RunProxy(
+		*localAddr,
+		*remoteAddr,
+		*verbose,
+		*veryverbose,
+		*nagles,
+		*hex,
+		*colors,
+		*unwrapTLS,
+		*match,
+		*replace,
+	)
+}
+
+func RunProxy(
+	localAddr string,
+	remoteAddr string,
+	verbose bool,
+	veryverbose bool,
+	nagles bool,
+	hex bool,
+	colors bool,
+	unwrapTLS bool,
+	match string,
+	replace string,
+) {
 	logger := proxy.ColorLogger{
-		Verbose: *verbose,
-		Color:   *colors,
+		Verbose: verbose,
+		Color:   colors,
 	}
 
-	logger.Info("go-tcp-proxy (%s) proxing from %v to %v ", version, *localAddr, *remoteAddr)
+	logger.Info("go-tcp-proxy (%s) proxing from %v to %v ", version, localAddr, remoteAddr)
 
-	laddr, err := net.ResolveTCPAddr("tcp", *localAddr)
+	laddr, err := net.ResolveTCPAddr("tcp", localAddr)
 	if err != nil {
 		logger.Warn("Failed to resolve local address: %s", err)
 		os.Exit(1)
 	}
-	raddr, err := net.ResolveTCPAddr("tcp", *remoteAddr)
+	raddr, err := net.ResolveTCPAddr("tcp", remoteAddr)
 	if err != nil {
 		logger.Warn("Failed to resolve remote address: %s", err)
 		os.Exit(1)
@@ -55,11 +81,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	matcher := createMatcher(*match)
-	replacer := createReplacer(*replace)
+	matcher := createMatcher(match)
+	replacer := createReplacer(replace)
 
-	if *veryverbose {
-		*verbose = true
+	if veryverbose {
+		verbose = true
 	}
 
 	for {
@@ -71,9 +97,9 @@ func main() {
 		connid++
 
 		var p *proxy.Proxy
-		if *unwrapTLS {
+		if unwrapTLS {
 			logger.Info("Unwrapping TLS")
-			p = proxy.NewTLSUnwrapped(conn, laddr, raddr, *remoteAddr)
+			p = proxy.NewTLSUnwrapped(conn, laddr, raddr, remoteAddr)
 		} else {
 			p = proxy.New(conn, laddr, raddr)
 		}
@@ -81,13 +107,13 @@ func main() {
 		p.Matcher = matcher
 		p.Replacer = replacer
 
-		p.Nagles = *nagles
-		p.OutputHex = *hex
+		p.Nagles = nagles
+		p.OutputHex = hex
 		p.Log = proxy.ColorLogger{
-			Verbose:     *verbose,
-			VeryVerbose: *veryverbose,
+			Verbose:     verbose,
+			VeryVerbose: veryverbose,
 			Prefix:      fmt.Sprintf("Connection #%03d ", connid),
-			Color:       *colors,
+			Color:       colors,
 		}
 
 		go p.Start()
