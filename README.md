@@ -8,14 +8,14 @@ This project was intended for debugging text-based protocols. The next version w
 
 **Binaries**
 
-Download [the latest release](https://github.com/jpillora/go-tcp-proxy/releases/latest), or
+Download [the latest release](https://github.com/ondrejsika/go-tcp-proxy/releases/latest), or
 
 Install latest release now with `curl https://i.jpillora.com/go-tcp-proxy! | bash`
 
 **Source**
 
 ``` sh
-$ go get -v github.com/jpillora/go-tcp-proxy/cmd/tcp-proxy
+$ go get -v github.com/ondrejsika/go-tcp-proxy/cmd/tcp-proxy
 ```
 
 ## Usage
