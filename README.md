@@ -28,6 +28,8 @@ Usage of tcp-proxy:
   -l="localhost:9999": local address
   -n: disable nagles algorithm
   -r="localhost:80": remote address
+  -m="localhost:9001": mirror request address e.g. localhost:9001
+  -o="localhost:9002": mirror response address e.g. localhost:9002
   -match="": match regex (in the form 'regex')
   -replace="": replace regex (in the form 'regex~replacer')
   -v: display server actions
