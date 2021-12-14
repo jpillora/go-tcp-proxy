@@ -17,16 +17,18 @@ var (
 	connid  = uint64(0)
 	logger  proxy.ColorLogger
 
-	localAddr   = flag.String("l", ":9999", "local address")
-	remoteAddr  = flag.String("r", "localhost:80", "remote address")
-	verbose     = flag.Bool("v", false, "display server actions")
-	veryverbose = flag.Bool("vv", false, "display server actions and all tcp data")
-	nagles      = flag.Bool("n", false, "disable nagles algorithm")
-	hex         = flag.Bool("h", false, "output hex")
-	colors      = flag.Bool("c", false, "output ansi colors")
-	unwrapTLS   = flag.Bool("unwrap-tls", false, "remote connection with TLS exposed unencrypted locally")
-	match       = flag.String("match", "", "match regex (in the form 'regex')")
-	replace     = flag.String("replace", "", "replace regex (in the form 'regex~replacer')")
+	localAddr      = flag.String("l", ":9999", "local address")
+	remoteAddr     = flag.String("r", "localhost:80", "remote address")
+	mirrorReqAddr  = flag.String("m", "", "mirror request address e.g. localhost:9001")
+	mirrorRespAddr = flag.String("o", "", "mirror response address e.g. localhost:9002")
+	verbose        = flag.Bool("v", false, "display server actions")
+	veryverbose    = flag.Bool("vv", false, "display server actions and all tcp data")
+	nagles         = flag.Bool("n", false, "disable nagles algorithm")
+	hex            = flag.Bool("h", false, "output hex")
+	colors         = flag.Bool("c", false, "output ansi colors")
+	unwrapTLS      = flag.Bool("unwrap-tls", false, "remote connection with TLS exposed unencrypted locally")
+	match          = flag.String("match", "", "match regex (in the form 'regex')")
+	replace        = flag.String("replace", "", "replace regex (in the form 'regex~replacer')")
 )
 
 func main() {
@@ -37,7 +39,7 @@ func main() {
 		Color:   *colors,
 	}
 
-	logger.Info("go-tcp-proxy (%s) proxing from %v to %v ", version, *localAddr, *remoteAddr)
+	logger.Info("go-tcp-proxy (%s) proxying from %s to %s", version, *localAddr, *remoteAddr)
 
 	laddr, err := net.ResolveTCPAddr("tcp", *localAddr)
 	if err != nil {
@@ -48,6 +50,24 @@ func main() {
 	if err != nil {
 		logger.Warn("Failed to resolve remote address: %s", err)
 		os.Exit(1)
+	}
+	var mReqAddr *net.TCPAddr
+	if *mirrorReqAddr != "" {
+		mReqAddr, err = net.ResolveTCPAddr("tcp", *mirrorReqAddr)
+		if err != nil {
+			logger.Warn("Failed to resolve mirror requests address: %s", err)
+			os.Exit(1)
+		}
+		logger.Info("proxying incoming requests from %s to %s", *localAddr, *mirrorReqAddr)
+	}
+	var mRespAddr *net.TCPAddr
+	if *mirrorRespAddr != "" {
+		mRespAddr, err = net.ResolveTCPAddr("tcp", *mirrorRespAddr)
+		if err != nil {
+			logger.Warn("Failed to resolve mirror responses address: %s", err)
+			os.Exit(1)
+		}
+		logger.Info("proxying outgoing responses from %s to %s", *localAddr, *mirrorRespAddr)
 	}
 	listener, err := net.ListenTCP("tcp", laddr)
 	if err != nil {
@@ -73,9 +93,9 @@ func main() {
 		var p *proxy.Proxy
 		if *unwrapTLS {
 			logger.Info("Unwrapping TLS")
-			p = proxy.NewTLSUnwrapped(conn, laddr, raddr, *remoteAddr)
+			p = proxy.NewTLSUnwrapped(conn, laddr, raddr, mReqAddr, mRespAddr, *remoteAddr)
 		} else {
-			p = proxy.New(conn, laddr, raddr)
+			p = proxy.New(conn, laddr, raddr, mReqAddr, mRespAddr)
 		}
 
 		p.Matcher = matcher
