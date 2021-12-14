@@ -37,7 +37,7 @@ func main() {
 		Color:   *colors,
 	}
 
-	logger.Info("go-tcp-proxy (%s) proxing from %v to %v ", version, *localAddr, *remoteAddr)
+	logger.Info("go-tcp-proxy (%s) proxying from %s to %s", version, *localAddr, *remoteAddr)
 
 	laddr, err := net.ResolveTCPAddr("tcp", *localAddr)
 	if err != nil {

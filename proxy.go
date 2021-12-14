@@ -89,7 +89,7 @@ func (p *Proxy) Start() {
 
 	//wait for close...
 	<-p.errsig
-	p.Log.Info("Closed (%d bytes sent, %d bytes recieved)", p.sentBytes, p.receivedBytes)
+	p.Log.Info("Closed (%d bytes sent, %d bytes received)", p.sentBytes, p.receivedBytes)
 }
 
 func (p *Proxy) err(s string, err error) {
@@ -108,9 +108,9 @@ func (p *Proxy) pipe(src, dst io.ReadWriter) {
 
 	var dataDirection string
 	if islocal {
-		dataDirection = ">>> %d bytes sent%s"
+		dataDirection = ">>> %d bytes sent %s"
 	} else {
-		dataDirection = "<<< %d bytes recieved%s"
+		dataDirection = "<<< %d bytes received %s"
 	}
 
 	var byteFormat string
