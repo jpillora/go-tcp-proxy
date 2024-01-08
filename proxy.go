@@ -97,7 +97,7 @@ func (p *Proxy) Start() {
 			Version:           p.ProxyProtocol.Version,
 			Command:           proxyproto.PROXY,
 			TransportProtocol: proxyproto.TCPv4,
-			SourceAddr:        p.rconn.LocalAddr(),
+			SourceAddr:        p.lconn.RemoteAddr(),
 			DestinationAddr:   p.rconn.RemoteAddr(),
 		}
 		p.Log.Info("Send proxy header from (%s to %s)", header.SourceAddr.String(), header.DestinationAddr.String())
