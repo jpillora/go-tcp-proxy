@@ -17,16 +17,18 @@ var (
 	connid  = uint64(0)
 	logger  proxy.ColorLogger
 
-	localAddr   = flag.String("l", ":9999", "local address")
-	remoteAddr  = flag.String("r", "localhost:80", "remote address")
-	verbose     = flag.Bool("v", false, "display server actions")
-	veryverbose = flag.Bool("vv", false, "display server actions and all tcp data")
-	nagles      = flag.Bool("n", false, "disable nagles algorithm")
-	hex         = flag.Bool("h", false, "output hex")
-	colors      = flag.Bool("c", false, "output ansi colors")
-	unwrapTLS   = flag.Bool("unwrap-tls", false, "remote connection with TLS exposed unencrypted locally")
-	match       = flag.String("match", "", "match regex (in the form 'regex')")
-	replace     = flag.String("replace", "", "replace regex (in the form 'regex~replacer')")
+	localAddr            = flag.String("l", ":9999", "local address")
+	remoteAddr           = flag.String("r", "localhost:80", "remote address")
+	verbose              = flag.Bool("v", false, "display server actions")
+	veryverbose          = flag.Bool("vv", false, "display server actions and all tcp data")
+	nagles               = flag.Bool("n", false, "disable nagles algorithm")
+	hex                  = flag.Bool("h", false, "output hex")
+	colors               = flag.Bool("c", false, "output ansi colors")
+	unwrapTLS            = flag.Bool("unwrap-tls", false, "remote connection with TLS exposed unencrypted locally")
+	match                = flag.String("match", "", "match regex (in the form 'regex')")
+	replace              = flag.String("replace", "", "replace regex (in the form 'regex~replacer')")
+	proxyProtocol        = flag.Bool("p", false, "Enable proxy protocol for passthrought the real IP")
+	proxyProtocolVersion = flag.Int("pv", 2, "Proxy protocol version (1, 2) default: 2")
 )
 
 func main() {
@@ -88,6 +90,11 @@ func main() {
 			VeryVerbose: *veryverbose,
 			Prefix:      fmt.Sprintf("Connection #%03d ", connid),
 			Color:       *colors,
+		}
+
+		p.ProxyProtocol = proxy.ProxyProtocol{
+			Enabled: *proxyProtocol,
+			Version: byte(*proxyProtocolVersion),
 		}
 
 		go p.Start()

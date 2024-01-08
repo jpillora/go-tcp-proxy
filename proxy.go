@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"io"
 	"net"
+
+	proxyproto "github.com/pires/go-proxyproto"
 )
 
 // Proxy - Manages a Proxy connection, piping data between local and remote.
@@ -11,19 +13,26 @@ type Proxy struct {
 	sentBytes     uint64
 	receivedBytes uint64
 	laddr, raddr  *net.TCPAddr
-	lconn, rconn  io.ReadWriteCloser
-	erred         bool
-	errsig        chan bool
-	tlsUnwrapp    bool
-	tlsAddress    string
+	// lconn, rconn  io.ReadWriteCloser
+	lconn, rconn net.Conn
+	erred        bool
+	errsig       chan bool
+	tlsUnwrapp   bool
+	tlsAddress   string
 
 	Matcher  func([]byte)
 	Replacer func([]byte) []byte
 
 	// Settings
-	Nagles    bool
-	Log       Logger
-	OutputHex bool
+	Nagles        bool
+	Log           Logger
+	OutputHex     bool
+	ProxyProtocol ProxyProtocol
+}
+
+type ProxyProtocol struct {
+	Version byte
+	Enabled bool
 }
 
 // New - Create a new Proxy instance. Takes over local connection passed in,
@@ -64,6 +73,7 @@ func (p *Proxy) Start() {
 	} else {
 		p.rconn, err = net.DialTCP("tcp", nil, p.raddr)
 	}
+
 	if err != nil {
 		p.Log.Warn("Remote connection failed: %s", err)
 		return
@@ -82,6 +92,18 @@ func (p *Proxy) Start() {
 
 	//display both ends
 	p.Log.Info("Opened %s >>> %s", p.laddr.String(), p.raddr.String())
+
+	if p.ProxyProtocol.Enabled {
+		header := &proxyproto.Header{
+			Version:           p.ProxyProtocol.Version,
+			Command:           proxyproto.PROXY,
+			TransportProtocol: proxyproto.TCPv4,
+			SourceAddr:        p.rconn.LocalAddr(),
+			DestinationAddr:   p.rconn.RemoteAddr(),
+		}
+		p.Log.Info("Send proxy header from (%s to %s)", header.SourceAddr.String(), header.DestinationAddr.String())
+		header.WriteTo(p.rconn)
+	}
 
 	//bidirectional copy
 	go p.pipe(p.lconn, p.rconn)
