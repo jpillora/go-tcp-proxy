@@ -13,12 +13,11 @@ type Proxy struct {
 	sentBytes     uint64
 	receivedBytes uint64
 	laddr, raddr  *net.TCPAddr
-	// lconn, rconn  io.ReadWriteCloser
-	lconn, rconn net.Conn
-	erred        bool
-	errsig       chan bool
-	tlsUnwrapp   bool
-	tlsAddress   string
+	lconn, rconn  net.Conn
+	erred         bool
+	errsig        chan bool
+	tlsUnwrapp    bool
+	tlsAddress    string
 
 	Matcher  func([]byte)
 	Replacer func([]byte) []byte
